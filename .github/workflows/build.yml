@@ -8,13 +8,10 @@ jobs:
   build-package:
     name: Build Package
     runs-on: ubuntu-24.04
-    steps:
-      - name: Install GCC
-        run: |
-          sudo apt-get update
-          sudo apt-get install build-essential
-          sudo apt-get cmake
-      
+    steps:      
       - name: Checkout Project
         uses: actions/checkout@v4.2.2
+
+      - name: Test
+        run: cmake --version
 
