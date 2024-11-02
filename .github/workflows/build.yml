@@ -8,9 +8,14 @@ jobs:
   build-package:
     name: Build Package
     runs-on: ubuntu-24.04
-    steps:      
+    steps:   
       - name: Checkout Project
         uses: actions/checkout@v4.2.2
+
+      - name: Cppcheck & clang-tidy
+        run: |
+          sudo apt-get install cppcheck
+          sudo apt-get install clang-tidy
 
       - name: Configure 
         run: cmake --preset release
