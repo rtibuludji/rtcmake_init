@@ -1,0 +1,75 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PROJECT_NAME: "rtcmake_init"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+    - name: set version name
+      id: version
+      run: echo ::set-output name=name::${GITHUB_REF#refs/tags/}
+    
+    - name: Checkout Project
+      uses: actions/checkout@v4.2.2
+      with:
+        submodules: recursive
+
+    - name: Configure 
+      run: cmake --preset release
+
+    - name: Build
+      run: cmake --build --preset release --target rtcmake_init
+
+    - name: Install
+      run: cmake --build --preset release --target install
+
+    - name: Generate archive
+      run: |
+        rm -rf .target
+        tar -cvzf $HOME/artifact.tar.gz .
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ runner.os }}-${{ steps.version.outputs.name }}
+        path: '~/artifact.*'
+
+  release:
+    if: contains(github.ref, 'tags/v')
+    name: Release
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+    - name: set version name
+      id: version
+      run: echo ::set-output name=name::${GITHUB_REF#refs/tags/}
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.name }}
+        # if needed, you can set the release body here
+        #body: "Release notes"
+        draft: false
+        prerelease: false
+
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: "artifact.tar.gz"
+        asset_name: "${{ env.PROJECT_NAME }}-Linux-${{ steps.version.outputs.name }}.tar.gz"
+        asset_content_type: application/x-tar
