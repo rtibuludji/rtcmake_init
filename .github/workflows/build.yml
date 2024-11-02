@@ -12,6 +12,6 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v4.2.2
 
-      - name: Test
-        run: cmake --version
+      - name: Compile
+        run: cmake --build --preset release --target rtcmake_init
 
