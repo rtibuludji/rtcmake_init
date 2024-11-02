@@ -4,15 +4,19 @@ on:
     branches:
       - '**'
       - '!main'
+  pull_request:
+    branches:
+      - '**'
+      - '!main'
 jobs:
-  build-package:
-    name: Build Package
-    runs-on: ubuntu-24.04
+  build:
+    name: Build
+    runs-on: ubuntu-latest
     steps:   
       - name: Checkout Project
         uses: actions/checkout@v4.2.2
 
-      - name: Cppcheck & clang-tidy
+      - name: Install static analyzer
         run: |
           sudo apt-get install cppcheck
           sudo apt-get install clang-tidy
@@ -22,3 +26,7 @@ jobs:
       
       - name: Build
         run: cmake --build --preset release --target rtcmake_init
+
+      - name: Install
+        run: cmake --build --preset release --target install
+
