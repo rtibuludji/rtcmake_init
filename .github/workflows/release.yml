@@ -10,7 +10,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: set version name
       id: version
@@ -44,7 +44,7 @@ jobs:
   release:
     if: contains(github.ref, 'tags/v')
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     steps:
     - name: set version name
