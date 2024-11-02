@@ -13,20 +13,20 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:   
-      - name: Checkout Project
-        uses: actions/checkout@v4.2.2
+    - name: Checkout Project
+      uses: actions/checkout@v4.2.2
 
-      - name: Install static analyzer
-        run: |
-          sudo apt-get install cppcheck
-          sudo apt-get install clang-tidy
+    - name: Install static analyzer
+      run: |
+        sudo apt-get install cppcheck
+        sudo apt-get install clang-tidy
 
-      - name: Configure 
-        run: cmake --preset release
-      
-      - name: Build
-        run: cmake --build --preset release --target rtcmake_init
+    - name: Configure 
+      run: cmake --preset release
+    
+    - name: Build
+      run: cmake --build --preset release --target rtcmake_init
 
-      - name: Install
-        run: cmake --build --preset release --target install
+    - name: Install
+      run: cmake --build --preset release --target install
 
