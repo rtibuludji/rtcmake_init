@@ -1,0 +1,20 @@
+#
+#
+#
+set(sources 
+    src/prompt/rtcmake_prompt.c
+    src/prompt/rtcmake_prompt_question.c
+    src/prompt/rtcmake_prompt_selection.c
+    src/prompt/rtcmake_prompt_yesno.c
+    src/rtcmake_init.c
+    src/rtcmake_create.c
+    src/files/file_cmakepresets.c
+    src/files/file_cmakelists.c
+    src/rtcmake_util.c
+)
+
+set(headers 
+    include/rtcmake_prompt.h
+    include/rtcmake_util.h
+    include/rtcmake_init.h
+)

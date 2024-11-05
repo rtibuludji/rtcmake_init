@@ -1,0 +1,31 @@
+name: build
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+  pull_request:
+    branches:
+      - '**'
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:   
+    - name: Checkout Project
+      uses: actions/checkout@v4.2.2
+
+    - name: Install static analyzer
+      run: |
+        sudo apt-get install cppcheck
+        sudo apt-get install clang-tidy
+
+    - name: Configure 
+      run: cmake --preset release
+    
+    - name: Build
+      run: cmake --build --preset release --target rtcmake_init
+
+    - name: Install
+      run: cmake --build --preset release --target install
+

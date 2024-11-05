@@ -1,0 +1,79 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PROJECT_NAME: "rtcmake_init"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+    - name: set version name
+      id: version
+      run: echo name=${GITHUB_REF#refs/tags/} >> $GITHUB_OUTPUT
+    
+    - name: Checkout Project
+      uses: actions/checkout@v4.2.2
+      with:
+        submodules: recursive
+  
+    - name: Install static analyzer
+      run: |
+        sudo apt-get install cppcheck
+        sudo apt-get install clang-tidy
+    
+    - name: Configure 
+      run: cmake --preset release
+
+    - name: Build
+      run: cmake --build --preset release --target rtcmake_init
+
+    - name: Install
+      run: cmake --build --preset release --target install
+
+    - name: Generate archive
+      run: |
+        cp -R $HOME/work/rtcmake_init/rtcmake_init/.target/release/out/bin $HOME/bin
+        rm -rf .target
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ steps.version.outputs.name }}
+        path: '~/bin'
+
+  release:
+    if: contains(github.ref, 'tags/v')
+    name: Release
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+    - name: Set version name
+      id: version
+      run: echo name=${GITHUB_REF#refs/tags/} >> $GITHUB_OUTPUT
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: release-with-dirs
+
+    - name: Setup artifacts
+      run: |
+        mkdir release 
+        mv release-with-dirs/*/* release/
+
+    - name: Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        name: Release ${{ steps.version.outputs.name }}
+        tag_name: ${{ github.ref }}
+        files: release/*
+        draft: false
+        prerelease: false
